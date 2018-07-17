@@ -13,7 +13,8 @@ class SwaggerMock {
             path: '/v2/api-docs',
             method: 'GET',
             projectName: 'swagger', //项目名称
-            mockPort: 3000 //模块数据服务端口
+            mockPort: 3001, //模块数据服务端口
+            mockPos: './' //mock文档生成的相对位置
         }, options);
         this.main();
     }
@@ -72,7 +73,7 @@ class SwaggerMock {
 
                                 if (objkey) {
                                     //生成文件
-                                    let mockDir = `./${mockDirName}/${pathKey}.json`;
+                                    let mockDir = `${this.options.mockPos}${mockDirName}/${pathKey}.json`;
                                     var filePath = path.resolve(__dirname, mockDir);
                                     let jsonData = {};
                                     let key = queryData(objkey);
@@ -91,10 +92,11 @@ class SwaggerMock {
                     }
                 }
 
-                promiseArray.push(createMockJson(path.resolve(__dirname, `${mockDirName}/urlsReal.json`), JSON.stringify(urlsReal, null, 2)));
+                promiseArray.push(createMockJson(path.resolve(__dirname, `${this.options.mockPos}${mockDirName}/urlsReal.json`), JSON.stringify(urlsReal, null, 2)));
                 Promise.all(promiseArray).then((values) => { //文件创建完成后，再启动服务
                     app.listen(this.options.mockPort, () => {
                         console.log(`【${new Date()}】服务器启动!`);
+                        console.log(`http://127.0.0.1:${this.options.mockPort}`);
                     });
                 });
 
