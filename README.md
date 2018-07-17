@@ -51,3 +51,8 @@ node run.js
 ```bash
 http://127.0.0.1:3000/xxx/xxx/xxx.do
 ```
+
+<p>
+所有的接口路径请求，都生成在${projectName}/urlsReal.json里
+</p>
+
