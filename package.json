@@ -1,18 +1,24 @@
 {
-    "name": "swagger-mock",
+    "name": "swagger-mock-fe",
     "version": "1.0.0",
-    "description": "分析Swagger文档，输出相应的mock数据，并启动node服务，供前端开发，提高前端开发效率",
+    "description": "分析Swagger文档，输出相应的mock数据，并启动node服务，供前端开发时调试使用，提高前端开发效率",
     "main": "index.js",
     "scripts": {
         "server": "node run.js"
     },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/shelly0702/swagger-mock-fe.git"
+    },
     "keywords": [
         "swagger",
         "mock",
-        "swagger-mock"
+        "swagger-mock",
+        "node",
+        "server"
     ],
-    "author": "廖艳丽",
-    "license": "ISC",
+    "author": "廖艳丽 1079160717@qq.com",
+    "license": "MIT",
     "devDependencies": {
         "express": "^4.16.3",
         "request": "^2.87.0"
