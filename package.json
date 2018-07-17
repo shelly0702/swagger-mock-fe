@@ -1,0 +1,20 @@
+{
+    "name": "swagger-mock",
+    "version": "1.0.0",
+    "description": "分析Swagger文档，输出相应的mock数据，并启动node服务，供前端开发，提高前端开发效率",
+    "main": "index.js",
+    "scripts": {
+        "server": "node run.js"
+    },
+    "keywords": [
+        "swagger",
+        "mock",
+        "swagger-mock"
+    ],
+    "author": "廖艳丽",
+    "license": "ISC",
+    "devDependencies": {
+        "express": "^4.16.3",
+        "request": "^2.87.0"
+    }
+}
