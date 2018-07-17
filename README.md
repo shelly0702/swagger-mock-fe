@@ -3,13 +3,13 @@
   <p>分析Swagger文档，输出相应的mock数据，并启动node服务，供前端开发时调试使用，提高前端开发效率</p>
 </div>
 
-<h2 align="center">安装</h2>
+### 安装
 
 ```bash
 npm install --save-dev swagger-mock-fe
 ```
 
-<h2 align="center">用法</h2>
+### 用法
 
 ```js
 const swaggerMock = require('swagger-mock-fe');
@@ -19,7 +19,8 @@ new swaggerMock({
 });
 ```
 
-<h2 align="center">参数</h2>
+### 参数
+
 |Attributes|forma|describe
 |---|---|---|
 |host| string| swagger文档地址ip,必填
@@ -30,18 +31,22 @@ new swaggerMock({
 |mockPos| string| mock文档生成的相对位置，默认为./
 
 
-<h2 align="center">运行</h2>
+### 运行
+
 <p>
 将上面的代码放置于安装了依赖后的项目中的某个js中，如run.js,执行如下命令
 </p>
-```js
+
+```bash
 node run.js
 ```
 
-<h2 align="center">使用</h2>
+### 使用
+
 <p>
 访问如下形式的真实地址，即可看到模拟数据,端口默认为3000，可配置为其他值
 </p>
-```js
+
+```bash
 http://127.0.0.1:3000/xxx/xxx/xxx.do
 ```
