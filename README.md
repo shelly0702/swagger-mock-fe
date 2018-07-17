@@ -15,7 +15,8 @@ npm install --save-dev swagger-mock-fe
 const swaggerMock = require('swagger-mock-fe');
 new swaggerMock({
     host: '10.xxx.xxx.15',//此处是swagger文档服务ip
-    projectName: 'test'
+    projectName: 'test',
+    mockPos: '../../'
 });
 ```
 
