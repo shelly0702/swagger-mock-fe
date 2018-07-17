@@ -16,7 +16,10 @@ const swaggerMock = require('swagger-mock-fe');
 new swaggerMock({
     host: '10.xxx.xxx.15',//此处是swagger文档服务ip
     projectName: 'test',
-    mockPos: '../../'
+    mockPos: '../../',
+    headers: {
+        'host': '域名'
+    }
 });
 ```
 
@@ -26,10 +29,12 @@ new swaggerMock({
 |---|---|---|
 |host| string| swagger文档地址ip,必填
 |hostname|string| swagger文档访问域名，如果此处传入任何值，host字段则不生效
+|path|string| swagger文档数据请求路径，在swagger文档页面可以找到
 |port| integer| swagger文档地址端口号, 默认80
 |projectName| string| 项目名，默认值swaggermock
 |mockPort| string| 本地mock服务启动后的端口，默认为3001
 |mockPos| string| mock文档生成的相对位置，默认为./
+|headers| object| 一般用于host的配置
 
 
 ### 运行

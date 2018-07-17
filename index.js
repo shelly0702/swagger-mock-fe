@@ -14,7 +14,7 @@ class SwaggerMock {
             method: 'GET',
             projectName: 'swagger', //项目名称
             mockPort: 3001, //模块数据服务端口
-            mockPos: './' //mock文档生成的相对位置
+            mockPos: './', //mock文档生成的相对位置
         }, options);
         this.main();
     }
@@ -23,6 +23,7 @@ class SwaggerMock {
         const req = http.request(this.options, (res) => {
             console.log(`状态码: ${res.statusCode}`);
             console.log(`响应头: ${JSON.stringify(res.headers)}`);
+
             res.setEncoding('utf8');
             if (res.statusCode != 200) {
                 console.log('请检查配置是否设置正确！');
@@ -43,6 +44,7 @@ class SwaggerMock {
                 let mockDirName = `${this.options.mockPos}${this.options.projectName}mock`;
                 let promiseArray = [];
                 let globalDefinitions = jsonGlobal.definitions; //数据模型
+
                 deleteall(path.resolve(__dirname, mockDirName)); //删除目录
                 createMock(mockDirName); //创建目录
                 //遍历tags
@@ -76,8 +78,9 @@ class SwaggerMock {
                                     let mockDir = `${mockDirName}/${pathKey}.json`;
                                     var filePath = path.resolve(__dirname, mockDir);
                                     let jsonData = {};
+                                    // objkey = '#/definitions/统一返回数据处理«List«MenuDto»»';
                                     let key = queryData(objkey);
-                                    jsonData = dealModel(globalDefinitions[key], globalDefinitions);
+                                    jsonData = dealModel(globalDefinitions[key], globalDefinitions, key);
                                     promiseArray.push(createMockJson(filePath, JSON.stringify(jsonData, null, 2), function() {
                                         createServer(http_path, mockDir, http_type);
                                     }, function() {
@@ -143,6 +146,7 @@ function dealModel(definitions, globalDefinitions) {
                 dealModel(items, globalDefinitions);
             } else {
                 let objkey = queryData(definitions.items['$ref']);
+                //防止递归数据造成死循环
                 result = [dealModel(globalDefinitions[objkey], globalDefinitions)];
             }
 
@@ -151,7 +155,7 @@ function dealModel(definitions, globalDefinitions) {
         let goObject = definitions['$ref'];
         if (goObject) {
             let objkey = queryData(goObject);
-            result = dealModel(globalDefinitions[objkey], globalDefinitions);
+            result = dealModel(globalDefinitions[objkey], globalDefinitions, objkey);
         }
 
     }

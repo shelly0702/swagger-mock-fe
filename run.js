@@ -1,7 +1,10 @@
 let swaggerMock = require('./index');
 new swaggerMock({
-    host: '10.182.27.15',
+    host: 'xxxxx',
+    path: '/zv2/api-docs',
     projectName: 'youli',
-    mockPort: 9999,
-    mockPos: '../../'
+    mockPos: './',
+    headers: {
+        'host': 'xxx.xxx.com'
+    }
 })
