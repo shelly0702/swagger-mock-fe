@@ -18,3 +18,11 @@ new swaggerMock({
     projectName: 'test'
 });
 ```
+
+<h2 align="center">运行</h2>
+<p>
+将上面的代码放置于安装了依赖后的项目中的某个js中，如run.js,执行如下命令
+</p>
+```js
+node run.js
+```
