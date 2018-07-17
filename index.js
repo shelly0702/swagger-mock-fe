@@ -40,7 +40,7 @@ class SwaggerMock {
                 let jsonGlobal = JSON.parse(global.replace('[object Object]', ''));
                 let tags = jsonGlobal.tags; //业务模块
                 let paths = jsonGlobal.paths; //所有路径
-                let mockDirName = `${this.options.projectName}mock`;
+                let mockDirName = `${this.options.mockPos}${this.options.projectName}mock`;
                 let promiseArray = [];
                 let globalDefinitions = jsonGlobal.definitions; //数据模型
                 deleteall(path.resolve(__dirname, mockDirName)); //删除目录
@@ -73,7 +73,7 @@ class SwaggerMock {
 
                                 if (objkey) {
                                     //生成文件
-                                    let mockDir = `${this.options.mockPos}${mockDirName}/${pathKey}.json`;
+                                    let mockDir = `${mockDirName}/${pathKey}.json`;
                                     var filePath = path.resolve(__dirname, mockDir);
                                     let jsonData = {};
                                     let key = queryData(objkey);
@@ -92,7 +92,7 @@ class SwaggerMock {
                     }
                 }
 
-                promiseArray.push(createMockJson(path.resolve(__dirname, `${this.options.mockPos}${mockDirName}/urlsReal.json`), JSON.stringify(urlsReal, null, 2)));
+                promiseArray.push(createMockJson(path.resolve(__dirname, `${mockDirName}/urlsReal.json`), JSON.stringify(urlsReal, null, 2)));
                 Promise.all(promiseArray).then((values) => { //文件创建完成后，再启动服务
                     app.listen(this.options.mockPort, () => {
                         console.log(`【${new Date()}】服务器启动!`);
@@ -196,6 +196,7 @@ function deleteall(path) {
 //文件夹创建过程
 function createMock(mockName) {
     let dir = path.resolve(__dirname, `${mockName}`);
+    console.log(`创建目录：${dir}`);
     //创建mock文件夹
     createDir(dir);
 }
