@@ -30,8 +30,8 @@ class SwaggerMock {
                 return;
             }
             // 所有的url数据
-            let urlsMock = {};
             let urlsReal = {}; //真实路径
+            let urlsRealJian = {};
             let global = {};
             res.on('data', (chunk) => {
                 global += chunk;
@@ -52,7 +52,6 @@ class SwaggerMock {
                     let tagName = tags[i].name; //模块名
                     let urlMockKey = tagName.toLowerCase(); //按模块对象key
                     urlsReal[urlMockKey] = {};
-                    urlsMock[urlMockKey] = {};
                     for (let key in paths) {
                         if (isHasTagName(tagName, paths[key])) {
                             
@@ -72,6 +71,10 @@ class SwaggerMock {
                                     url: http_path,
                                     type: http_type,
                                     desc: `${tags[i].description} -> ${http_desc}`
+                                };
+                                urlsRealJian[pathKey] = {
+                                    url: http_path,
+                                    type: http_type,
                                 };
 
                                 if (objkey) {
@@ -97,6 +100,10 @@ class SwaggerMock {
                 }
 
                 promiseArray.push(createMockJson(path.resolve(__dirname, `${mockDirName}/urlsReal.json`), JSON.stringify(urlsReal, null, 2)));
+                let hostname = this.options.headers.host?this.options.headers.host:this.options.hostname;
+                let host = hostname?hostname:this.options.host;
+                promiseArray.push(createMockJson(path.resolve(__dirname, `${mockDirName}/urlsReal.js`), 
+                    jsTpl(urlsRealJian,this.options.mockPort,host)));
                 Promise.all(promiseArray).then((values) => { //文件创建完成后，再启动服务
                     app.listen(this.options.mockPort, () => {
                         console.log(`【${new Date()}】服务器启动!`);
@@ -116,6 +123,22 @@ class SwaggerMock {
     }
 
 };
+
+function jsTpl(urlsRealJian,port,hostname) {
+    let tpl =  `let isDebug = (window.location.href).indexOf('debug') > -1;
+let host = isDebug?'127.0.0.1:${port}':'${hostname}';
+let url = {
+    `;
+for (let key in urlsRealJian) {
+    tpl += `'${key}':{
+        url:host + '${urlsRealJian[key].url}',
+        type: '${urlsRealJian[key].type}'
+    },
+    `;
+}
+tpl +=`}`;
+    return tpl;
+}
 
 //处理数据模型
 function dealModel(definitions, globalDefinitions) {
