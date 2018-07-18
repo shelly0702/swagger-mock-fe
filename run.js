@@ -1,10 +1,10 @@
-let swaggerMock = require('./index');
+const swaggerMock = require('./index');
 new swaggerMock({
-    host: 'xxxxx',
-    path: '/zv2/api-docs',
-    projectName: 'youli',
+    host: '192.168.62.146',//此处是swagger文档服务ip
+    projectName: 'jxi',
     mockPos: './',
+    mockPort: 3000,
     headers: {
-        'host': 'xxx.xxx.com'
+        'host': 'youai.jd.com'
     }
-})
+});

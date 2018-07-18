@@ -14,7 +14,7 @@ class SwaggerMock {
             method: 'GET',
             projectName: 'swagger', //项目名称
             mockPort: 3001, //模块数据服务端口
-            mockPos: './', //mock文档生成的相对位置
+            mockPos: '../../', //mock文档生成的相对位置
         }, options);
         this.main();
     }
@@ -55,12 +55,13 @@ class SwaggerMock {
                     urlsMock[urlMockKey] = {};
                     for (let key in paths) {
                         if (isHasTagName(tagName, paths[key])) {
-                            let http_path = key; //请求url
-                            let http_type = ''; //请求类型数组，一个请求可能支持多种类型
-                            let http_desc = '';
-                            let objkey = '';
-                            let pathKey = '';
+                            
                             for (let typekey in paths[key]) {
+                                let http_path = key; //请求url
+                                let http_type = ''; //请求类型数组，一个请求可能支持多种类型
+                                let http_desc = '';
+                                let objkey = '';
+                                let pathKey = '';
                                 http_type = typekey;
                                 http_desc = paths[key][typekey].summary;
                                 pathKey = paths[key][typekey].operationId;
@@ -79,12 +80,12 @@ class SwaggerMock {
                                     var filePath = path.resolve(__dirname, mockDir);
                                     let jsonData = {};
                                     // objkey = '#/definitions/统一返回数据处理«List«MenuDto»»';
-                                    let key = queryData(objkey);
-                                    jsonData = dealModel(globalDefinitions[key], globalDefinitions, key);
+                                    let tempkey = queryData(objkey);
+                                    jsonData = dealModel(globalDefinitions[tempkey], globalDefinitions);
                                     promiseArray.push(createMockJson(filePath, JSON.stringify(jsonData, null, 2), function() {
                                         createServer(http_path, mockDir, http_type);
                                     }, function() {
-                                        // createServer(http_path, mockDir);
+                                        // createServer(http_path, mockDir, http_type);
                                     }));
 
                                 }
@@ -155,7 +156,7 @@ function dealModel(definitions, globalDefinitions) {
         let goObject = definitions['$ref'];
         if (goObject) {
             let objkey = queryData(goObject);
-            result = dealModel(globalDefinitions[objkey], globalDefinitions, objkey);
+            result = dealModel(globalDefinitions[objkey], globalDefinitions);
         }
 
     }
