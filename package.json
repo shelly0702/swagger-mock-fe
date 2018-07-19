@@ -1,6 +1,6 @@
 {
     "name": "swagger-mock-fe",
-    "version": "1.0.6",
+    "version": "1.0.8",
     "description": "分析Swagger文档，输出相应的mock数据，并启动node服务，供前端开发时调试使用，提高前端开发效率",
     "main": "index.js",
     "scripts": {

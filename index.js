@@ -4,6 +4,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const types = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH', 'HEAD'];
+
 class SwaggerMock {
     constructor(options) {
         this.options = Object.assign({
@@ -32,6 +33,11 @@ class SwaggerMock {
             // 所有的url数据
             let urlsReal = {}; //真实路径
             let urlsRealJian = {};
+            let errorCounter = 0;
+            let errorUrls = [];
+            let sucCounter = 0;
+            let urlCounter = 0;
+
             let global = {};
             res.on('data', (chunk) => {
                 global += chunk;
@@ -54,8 +60,8 @@ class SwaggerMock {
                     urlsReal[urlMockKey] = {};
                     for (let key in paths) {
                         if (isHasTagName(tagName, paths[key])) {
-                            
                             for (let typekey in paths[key]) {
+                                urlCounter++;
                                 let http_path = key; //请求url
                                 let http_type = ''; //请求类型数组，一个请求可能支持多种类型
                                 let http_desc = '';
@@ -77,21 +83,25 @@ class SwaggerMock {
                                     type: http_type,
                                 };
 
+                                //生成文件
+                                let mockDir = `${mockDirName}/${pathKey}.json`;
+                                var filePath = path.resolve(__dirname, mockDir);
+                                let jsonData = {};
                                 if (objkey) {
-                                    //生成文件
-                                    let mockDir = `${mockDirName}/${pathKey}.json`;
-                                    var filePath = path.resolve(__dirname, mockDir);
-                                    let jsonData = {};
-                                    // objkey = '#/definitions/统一返回数据处理«List«MenuDto»»';
                                     let tempkey = queryData(objkey);
                                     jsonData = dealModel(globalDefinitions[tempkey], globalDefinitions);
-                                    promiseArray.push(createMockJson(filePath, JSON.stringify(jsonData, null, 2), function() {
-                                        createServer(http_path, mockDir, http_type);
-                                    }, function() {
-                                        // createServer(http_path, mockDir, http_type);
-                                    }));
-
+                                    
+                                } else {
+                                    let model = paths[key][typekey].responses['200'].schema?paths[key][typekey].responses['200'].schema:paths[key][typekey].responses['200'];
+                                    jsonData = dealModel(model,globalDefinitions);
                                 }
+                                promiseArray.push(createMockJson(filePath, JSON.stringify(jsonData, null, 2), function() {
+                                    createServer(http_path, mockDir, http_type);
+                                    sucCounter++;
+                                }, function() {
+                                    errorCounter++;
+                                    errorUrls.push(http_path);
+                                }));
                             }
 
 
@@ -105,13 +115,23 @@ class SwaggerMock {
                 promiseArray.push(createMockJson(path.resolve(__dirname, `${mockDirName}/urlsReal.js`), 
                     jsTpl(urlsRealJian,this.options.mockPort,host)));
                 Promise.all(promiseArray).then((values) => { //文件创建完成后，再启动服务
+                    console.log(`共产生${urlCounter}个url`);
+                    console.log(`共创建了${sucCounter}个文件`);
+                    if(errorCounter > 0) {
+                        console.log(`${errorCounter}个文件创建失败了，请检查相应的数据`);
+                        for(let i=0;i< errorUrls.length;i++) {
+                            console.warn(errorUrls[i]);
+                        }
+                    }
                     app.listen(this.options.mockPort, () => {
                         console.log(`【${new Date()}】服务器启动!`);
                         console.log(`http://127.0.0.1:${this.options.mockPort}`);
                     });
+                }).catch((e)=>{
+                    console.log(e);
                 });
 
-                console.log('响应中已无数据。');
+                // console.log('响应中已无数据。');
             });
         });
 
@@ -176,10 +196,12 @@ function dealModel(definitions, globalDefinitions) {
 
         }
     } else {
-        let goObject = definitions['$ref'];
+        let goObject = definitions['$ref']?definitions['$ref']:'';
         if (goObject) {
             let objkey = queryData(goObject);
             result = dealModel(globalDefinitions[objkey], globalDefinitions);
+        } else {
+            result = 'OK';
         }
 
     }
@@ -233,9 +255,9 @@ function createMock(mockName) {
 function createMockJson(filePath, jsonData, suc, err) {
     return createFile(filePath, jsonData).then(function(e) {
         if (suc) suc(e);
-        console.log(filePath + ' 文件创建成功！');
     }, function(e) {
         if (err) err(e);
+        console.log(filePath + ' 文件创建失败！')
         console.log(e)
     });
 }
@@ -251,16 +273,17 @@ function createDir(dir) {
 //文件创建
 function createFile(filePath, content) {
     return new Promise((resolve, reject) => {
-        fs.writeFile(filePath, content, (err) => {
-            if (!err) {
-                resolve(filePath);
-            } else {
-                reject(err);
-            }
-        });
         var stat = fs.existsSync(filePath);
         if (stat) { //为true的话那么存在，如果为false不存在
             reject(`${filePath} 已存在，内容已覆盖`);
+        } else {
+            fs.writeFile(filePath, content, (err) => {
+                if (!err) {
+                    resolve(filePath);
+                } else {
+                    reject(err);
+                }
+            });
         }
     });
 }
