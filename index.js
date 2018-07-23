@@ -89,7 +89,7 @@ class SwaggerMock {
                                 let jsonData = {};
                                 if (objkey) {
                                     let tempkey = queryData(objkey);
-                                    jsonData = dealModel(globalDefinitions[tempkey], globalDefinitions);
+                                    jsonData = dealModel(globalDefinitions[tempkey], globalDefinitions,tempkey);
                                     
                                 } else {
                                     let model = paths[key][typekey].responses['200'].schema?paths[key][typekey].responses['200'].schema:paths[key][typekey].responses['200'];
@@ -161,7 +161,7 @@ tpl +=`}`;
 }
 
 //处理数据模型
-function dealModel(definitions, globalDefinitions) {
+function dealModel(definitions, globalDefinitions,prevKey) {
     let result = {};
     let type = definitions && definitions.type ? definitions.type : '';
     if (type) {
@@ -178,7 +178,13 @@ function dealModel(definitions, globalDefinitions) {
             if (definitions.properties) {
                 result = definitions.properties;
                 for (let key in result) {
-                    result[key] = dealModel(result[key], globalDefinitions);
+                    //防止递归数据造成死循环
+                    if(result[key].type && result[key].type=='array' && result[key].items['$ref']&& (queryData(result[key].items['$ref'])==prevKey)) {
+                        result[key] = {};
+                    } else {
+                        result[key] = dealModel(result[key], globalDefinitions,key);
+                    }
+                    
                 }
             } else {
                 result = {};
@@ -191,7 +197,12 @@ function dealModel(definitions, globalDefinitions) {
             } else {
                 let objkey = queryData(definitions.items['$ref']);
                 //防止递归数据造成死循环
-                result = [dealModel(globalDefinitions[objkey], globalDefinitions)];
+                if(objkey!=prevKey) {
+                    result = [dealModel(globalDefinitions[objkey], globalDefinitions,objkey)];
+                } else {
+                    result = {};
+                }
+                
             }
 
         }
