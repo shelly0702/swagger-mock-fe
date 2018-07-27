@@ -1,6 +1,6 @@
 <div align="center">
   <h1>Swagger Mock FE</h1>
-  <p>分析Swagger文档，输出相应的mock数据，并启动node服务，供前端开发时调试使用，提高前端开发效率</p>
+  <p>分析Swagger文档，输出相应的mock数据，并启动node服务，供前端开发时调试使用，提高前端开发效率，支持跨域访问</p>
 </div>
 
 ### 安装
@@ -58,6 +58,6 @@ http://127.0.0.1:3000/xxx/xxx/xxx.do
 ```
 
 <p>
-所有的接口路径请求，都生成在${projectName}/urlsReal.json里
+所有的接口路径请求，都生成在${projectName}/urlsReal.js里
 </p>
 
